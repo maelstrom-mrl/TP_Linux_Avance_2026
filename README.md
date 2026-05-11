@@ -1,9 +1,9 @@
-# Atelier Linux Avancé — 10h
-### M1 Informatique · GitHub Codespaces · Processus & Services · Réseau & Sécurité · Conteneurs Docker
+# Atelier Linux Avancé
+### M2 Informatique · GitHub Codespaces · Processus & Services · Réseau & Sécurité · Conteneurs Docker
 
 ---
 
-> **Public cible :** Étudiants M1 Informatique, niveau Linux confirmé  
+> **Public cible :** Étudiants M2 Informatique, niveau Linux confirmé  
 > **Durée totale :** 10 heures  
 > **Environnement :** GitHub Codespaces (Ubuntu 22.04 LTS)  
 > **Prérequis :** Compte GitHub, notions de shell, connaissance des commandes de base
