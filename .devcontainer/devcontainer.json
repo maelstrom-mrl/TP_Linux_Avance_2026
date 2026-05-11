@@ -1,1 +1,10 @@
-dd
+{
+  "name": "Atelier Linux M1",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/common-utils:2": {}
+  },
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y nmap tcpdump iptables net-tools",
+  "remoteUser": "vscode"
+}
