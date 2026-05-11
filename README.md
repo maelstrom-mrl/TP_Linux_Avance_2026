@@ -31,7 +31,7 @@
 
 ### 0.1 — Création du Codespace
 
-1. Forker le dépôt de l'atelier : `github.com/<org>/atelier-linux-m1`
+1. Forker le dépôt de cet atelier
 2. Cliquer sur **Code → Codespaces → Create codespace on main**
 3. Attendre l'initialisation (environ 2 minutes)
 
