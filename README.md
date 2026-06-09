@@ -168,13 +168,16 @@ git commit -m "chore: init livrables/"
 
 ```text
 Votre commande :
-
+git log --oneline -5
 
 Votre résultat :
-
-
+10f7045 (HEAD -> main, origin/main, origin/HEAD) chore: init livrables/
+82cba81 début tp
+a08409f Extend workshop to 25h with kernel internals, eBPF, K8s and answer blocks
+372476f Configure devcontainer with Ubuntu 22.04 setup
+72284ee Create devcontainer.json
 Interprétation :
-
+C'est l'historique des commits git sur le repo jusqu'à présent.
 ```
 
 ---
@@ -226,65 +229,71 @@ htop
 
 ```text
 Votre commande :
-
+echo $$
 
 Votre résultat :
-
+224
 
 Interprétation :
-
+Le process du ce shell est le 224e processus actif lancé depuis le démarrage.
 ```
 
 #### Question 1.1.a.2 — Quel processus est le parent de votre shell (utilisez `ps -o pid,ppid,comm -p $$` puis remontez la chaîne) ?
 
 ```text
 Votre commande :
-
+ps -o pid,ppid,comm -p $$
+ps -o pid,ppid,comm -p 223
+ps -o pid,ppid,comm -p 222
 
 Votre résultat :
-
-
+    224     223 bash
+    223     222 Relay(224)
+    222       2 SessionLeader
 Interprétation :
-
+Les sessions shell sont gérés par le processus SessionLeader.
 ```
 
 #### Question 1.1.a.3 — Combien de threads le processus PID 1 utilise-t-il ? (Astuce : `/proc/1/status` champ `Threads`, ou `ps -L`.)
 
 ```text
 Votre commande :
-
+cat /proc/1/status
 
 Votre résultat :
-
+Threads:        1
 
 Interprétation :
-
+Le process init n'utilise qu'un fil CPU.
 ```
 
 #### Question 1.1.a.4 — Trouver le top 3 des processus consommant le plus de mémoire **résidente** (RSS), pas virtuelle.
 
 ```text
 Votre commande :
-
+ps -eo pid,user,comm,rss,%mem --sort=-rss | head -n 4
 
 Votre résultat :
-
+PID USER     COMMAND           RSS %MEM
+3291 mael     rust-analyzer-2 558032 14.1
+1671 mael     zed-remote-serv 117056  2.9
+5027 root     dockerd         84028  2.1
 
 Interprétation :
-
+Les process ci-dessus consomment actuellement la quantité de ram indiquée.
 ```
 
 #### Question 1.1.a.5 — Lire `/proc/$$/limits`. Quelle est la limite molle de `nofile` (max fichiers ouverts) pour votre shell ? La modifier temporairement à 2048 avec `ulimit -n`.
 
 ```text
 Votre commande :
-
-
+/proc/$$/limits
+ulimit -n 2948
 Votre résultat :
-
-
+Max open files            10240                1048576              file
+Max open files            2048                 2048                 files
 Interprétation :
-
+La session shell courant peut ouvrir un certain nombre de fichiers en simultané au maximum.
 ```
 
 #### Exercice 1.1.b — Manipulation des signaux
@@ -318,36 +327,41 @@ kill -SIGKILL $!
 
 ```text
 Votre commande :
-
+ps -o pid,stat,comm -p $PID_SLEEP
 
 Votre résultat :
-
-
+PID STAT COMMAND
+9228 T    sleep
+PID STAT COMMAND
+9228 S    sleep
 Interprétation :
-
+S (endormi et en attente d'un événement), D (sommeil ininterrompu, souvent lié à l'E/S)
 ```
 
 #### Question 1.1.b.2 — Lancez un `sleep 60`, suspendez-le avec Ctrl+Z, mettez-le en background avec `bg`, puis ramenez-le en foreground avec `fg`. Expliquer ce qui se passe en termes de signaux.
 
 ```text
 Votre commande :
-
+sleep 60
+ctrl-Z
+bg
+fg
 
 Votre résultat :
-
+Le process est arrêté puis resumé en arrière plan puis repassé au premier plan.
 
 Interprétation :
-
+SIGSTP -> SIGCONT -> pas de signal juste premier plan du process shell
 ```
 
 #### Question 1.1.b.3 — Pourquoi SIGKILL et SIGSTOP ne peuvent-ils pas être interceptés ? Lire `man 7 signal` et citer le passage pertinent.
 
 ```text
 Votre résultat :
-
+Ces signaux sont gérés directement et exclusivement par le noyau.
 
 Interprétation :
-
+C'est un garde fou pour permettre au système de toujours avoir la main sur tout processus.
 ```
 
 **Tableau des signaux importants :**
@@ -417,23 +431,38 @@ kill -SIGTERM $(pgrep -f signal_demo.sh)
 
 ```text
 Votre commande :
-
-
+./scripts/signal_demo.sh
+kill -1 10568
 Votre résultat :
-
+[15:08:22] SIGHUP reçu : rechargement de la configuration...
+[15:08:23] Configuration rechargée.
+[15:08:23] En cours... (itération 7)
+[15:08:28] En cours... (itération 8)
+^C
+[15:08:29] Signal reçu : nettoyage en cours...
+[15:08:29] Nettoyage terminé. Bye.
 
 Interprétation :
-
+Le script intercepte ces signaux et ajoute un comportement en fonction.
 ```
 
 #### Question 1.1.c.2 — Modifier le script pour qu'un SIGUSR1 affiche les statistiques courantes (uptime + nombre d'itérations) sans interrompre la boucle. Joindre le patch.
 
 ```text
 Patch (sortie de git diff) :
-
+show_stats() {
+    local now=$(date +%s)
+    local uptime=$((now - START_TIME))
+    echo ""
+    echo "--- [$(date +%T)] STATISTIQUES (SIGUSR1) ---"
+    echo "Uptime              : ${uptime} secondes"
+    echo "Nombre d'itérations : $counter"
+    echo "----------------------------------------"
+}
+trap show_stats SIGUSR1
 
 Interprétation :
-
+Ajout d'une fonction et d'une interception pour gérer ce type de signal.
 ```
 
 #### Question 1.1.c.3 — Que se passe-t-il si le `trap` est défini *après* le démarrage de la boucle infinie ? Tester et expliquer.
@@ -443,10 +472,10 @@ Votre commande :
 
 
 Votre résultat :
-
+Les signaux fonctionnent normalement mais ne sont plus gérés par le script.
 
 Interprétation :
-
+Les traps sont là mais il n'y a pas de pause pour laisser le temps de déclencher les signaux le script se termine donc directement.
 ```
 
 #### Exercice 1.1.d — Priorités, nice et ionice
@@ -477,13 +506,14 @@ kill $PID_LOW $PID_DEFAULT
 
 ```text
 Votre commande :
-
+top -p $PID_LOW,$PID_DEFAULT -d 30
 
 Votre résultat :
-
+11710 mael      39  19    5568   2024   1904 R  90.9   0.1  20:29.77 yes
+11726 mael      20   0    5568   1976   1852 R  81.8   0.1  20:19.02 yes
 
 Interprétation :
-
+Le process avec la priorité par défaut est traité plus rapidement et stagne moins en charge sur le CPU.
 ```
 
 #### Question 1.1.d.2 — Quelle est la plage valide de `nice` ? Et celle de `renice` accessible à un utilisateur non-root ? (Tester en augmentant puis en abaissant la valeur de nice.)
