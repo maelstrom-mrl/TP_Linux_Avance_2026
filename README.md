@@ -116,39 +116,41 @@ cat /proc/cmdline
 
 ```text
 Votre commande :
-
+uname -a
 
 Votre résultat :
-
+Linux AlphaPortable 6.6.114.1-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Mon Dec  1 20:46:23 UTC 2025 x86_64 GNU/Linux
 
 Interprétation :
-
+Le version du noyau linux est la 6.6.114.1 modifiée pour WSL.
 ```
 
 #### Question 0.2.b — Combien de vCPUs et combien de RAM le Codespace expose-t-il ? D'où vient cette information (`/proc/cpuinfo`, `lscpu`, cgroup) ?
 
 ```text
 Votre commande :
-
+lscpu
+free -m
 
 Votre résultat :
-
-
+CPU(s): 8
+Mem: 3838
 Interprétation :
-
+L'environnement dispose de 8 CPU et de ~4Go de RAM.
 ```
 
 #### Question 0.2.c — Inspecter `/proc/1/cgroup` et `/proc/1/status`. Le PID 1 du Codespace est-il vraiment `systemd` ? Pourquoi ?
 
 ```text
 Votre commande :
-
-
+cat /proc/1/status
+ps -faux
 Votre résultat :
-
+Name:   systemd
+root           1  0.0  0.3  23840 14452 ?        Ss   08:08   0:04 /sbin/init
 
 Interprétation :
-
+Le process numéro 1 est init qui a été lancé par le processus systemd lancé au démarrage.
 ```
 
 ### 0.3 — Première trace dans le dépôt
